@@ -87,7 +87,19 @@ async function handleUserMessage(session, message) {
 
   if (session.step === 'name') {
     const name = await extractName(text);
+    const duration = parseDuration(text);
+
     if (!name) {
+      // If they only gave a time (or name parse failed), still acknowledge duration
+      if (duration.ok) {
+        session.pendingDurationMs = duration.durationMs;
+        session.pendingDurationLabel = duration.label;
+        return {
+          reply: `I noted that you need ${duration.label}. First, please tell me your name (e.g. "John" or "My name is John").`,
+          step: 'name',
+          complete: false,
+        };
+      }
       return {
         reply: 'I could not find a valid name. Please tell me your name (e.g. "My name is John").',
         step: 'name',
@@ -97,13 +109,24 @@ async function handleUserMessage(session, message) {
 
     session.name = name;
 
-    // Multi-info: also accept a duration in the same message
-    const duration = parseDuration(text);
-    if (duration.ok) {
-      applyTime(session, duration);
+    // Multi-info in this message, or a duration saved from an earlier message
+    const durationToUse = duration.ok
+      ? duration
+      : session.pendingDurationMs
+        ? {
+            ok: true,
+            durationMs: session.pendingDurationMs,
+            label: session.pendingDurationLabel || 'your requested time',
+          }
+        : null;
+
+    if (durationToUse && durationToUse.ok) {
+      session.pendingDurationMs = null;
+      session.pendingDurationLabel = null;
+      applyTime(session, durationToUse);
       const remaining = session.waitUntil - Date.now();
       return {
-        reply: `Thanks, ${name}! I noted that you need ${duration.label}. Please wait ${formatRemaining(remaining)}. I will ask for your age after that.`,
+        reply: `Thanks, ${name}! I noted that you need ${durationToUse.label}. Please wait ${formatRemaining(remaining)}. I will ask for your age after that.`,
         step: 'waiting',
         waitRemainingMs: remaining,
         complete: false,

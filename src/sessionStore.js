@@ -12,6 +12,8 @@ function createEmptySession(id) {
     name: null,
     durationMs: null,
     waitUntil: null,
+    pendingDurationMs: null,
+    pendingDurationLabel: null,
     age: null,
     completedAt: null,
   };

@@ -24,9 +24,16 @@ function clearChat() {
   waitingBubbleEl = null;
 }
 
-function setInputEnabled(enabled) {
+function setInputEnabled(enabled, { waiting = false } = {}) {
   inputEl.disabled = !enabled;
   sendBtn.disabled = !enabled;
+  if (waiting) {
+    inputEl.placeholder = 'Timer running — please wait...';
+  } else if (enabled) {
+    inputEl.placeholder = 'Type your message...';
+  } else {
+    inputEl.placeholder = 'Conversation complete';
+  }
 }
 
 function formatCountdown(ms) {
@@ -118,13 +125,17 @@ function startTimer(waitRemainingMs) {
 }
 
 function applyUiFromState(data, { skipWaitingBubble = false } = {}) {
-  if (data.step === 'waiting' && data.waitRemainingMs > 0) {
+  const isWaiting = data.step === 'waiting' && data.waitRemainingMs > 0;
+
+  if (isWaiting) {
     startTimer(data.waitRemainingMs);
-  } else {
-    stopTimer();
-    if (!skipWaitingBubble) {
-      waitingBubbleEl = null;
-    }
+    setInputEnabled(false, { waiting: true });
+    return;
+  }
+
+  stopTimer();
+  if (!skipWaitingBubble) {
+    waitingBubbleEl = null;
   }
 
   if (data.complete) {

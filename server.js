@@ -64,18 +64,6 @@ app.post('/api/new-chat', (req, res) => {
   res.json(state);
 });
 
-app.get("/debug/session/:id", (req, res) => {
-  const session = session.get(req.params.id);
-
-  if (!session) {
-      return res.status(404).json({
-          error: "Session not found"
-      });
-  }
-
-  res.json(session);
-});
-
 const server = app.listen(PORT, () => {
   console.log(`Hello Sara! listening on http://localhost:${PORT}`);
 });
@@ -90,5 +78,3 @@ server.on('error', (err) => {
   }
   process.exit(1);
 });
-
-
