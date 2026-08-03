@@ -28,6 +28,7 @@ http://localhost:3000
 
 
 **Environment Variables**
+
 Variable	    	Description
 OPENAI_API_KEY  	Used for extracting the user's name from their message.
 PORT                Sets the server port. The default is 3000.
@@ -45,6 +46,7 @@ POST /api/new-chat — Starts a new conversation with a fresh session.
 
 
 **Project Structure**
+
 server.js              Express entry point
 src/sessionStore.js    In-memory session storage
 src/conversation.js    Conversation step logic
@@ -53,6 +55,7 @@ src/llm.js             Single-turn name extraction
 public/                Chatbot user interface
 
 **Sessions**
+
 The chatbot uses in-memory sessions. The server keeps only the information needed to continue the current conversation, such as the current step, name, duration, waiting time, and age.
 
 Chat messages themselves are not stored.
