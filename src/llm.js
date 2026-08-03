@@ -34,6 +34,7 @@ async function extractName(message) {
   }
 
   try {
+    console.log("Calling OpenAI")
     const completion = await openai.chat.completions.create({
       model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
       temperature: 0,
